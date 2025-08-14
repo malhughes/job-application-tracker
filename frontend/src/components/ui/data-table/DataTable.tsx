@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             </Button>
           </DrawerTrigger>
           <DrawerOverlay className="fixed inset-0 bg-black/5" />
-          <DrawerContent className="top-2 right-2 bottom-2 !max-w-1/4 rounded-l-xl">
+          <DrawerContent className="!max-w-1/4 bottom-2 right-2 top-2 rounded-l-xl">
             <div>
               <DrawerHeader>
                 <DrawerTitle className="text-2xl">Add Application</DrawerTitle>

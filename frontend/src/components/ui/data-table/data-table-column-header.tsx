@@ -1,20 +1,20 @@
-import type { Column } from "@tanstack/react-table"
-import { ArrowDown, ArrowUp, ChevronsUpDown, X } from "lucide-react"
+import * as React from 'react';
+import type { Column } from '@tanstack/react-table';
+import { ArrowDown, ArrowUp, ChevronsUpDown, X } from 'lucide-react';
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 
-interface DataTableColumnHeaderProps<TData, TValue>
-  extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>
-  title: string
+interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
+  column: Column<TData, TValue>;
+  title: string;
 }
 
 export function DataTableColumnHeader<TData, TValue>({
@@ -23,22 +23,22 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn(className)}>{title}</div>;
   }
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn('flex items-center gap-2', className)}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
-            className="data-[state=open]:bg-accent -ml-3 h-8 font-medium text-base"
+            className="data-[state=open]:bg-accent -ml-3 h-8 text-base font-medium"
           >
             <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
+            {column.getIsSorted() === 'desc' ? (
               <ArrowDown />
-            ) : column.getIsSorted() === "asc" ? (
+            ) : column.getIsSorted() === 'asc' ? (
               <ArrowUp />
             ) : (
               <ChevronsUpDown />
@@ -62,5 +62,5 @@ export function DataTableColumnHeader<TData, TValue>({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }
