@@ -7,7 +7,7 @@ import rateLimiter from './middleware/rateLimiter.js';
 dotenv.config();
 
 // Routes
-import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 import applicationsRoutes from './routes/applicationsRoutes.js';
 import aiProcessingRoutes from './routes/aiProcessingRoutes.js';
 
@@ -21,7 +21,7 @@ app.use(express.json()); // parses JSON body: req.body
 app.use(rateLimiter);
 
 // API Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/applications', applicationsRoutes);
 app.use('/api/ai', aiProcessingRoutes);
 

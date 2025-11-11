@@ -70,7 +70,7 @@ export function ApplicationForm() {
                     Upload File
                   </Button>
                   <Button disabled={!descriptionValue || descriptionValue.trim() === ''}>
-                    AI Extract Info
+                    Autofill
                   </Button>
                 </div>
               </FormItem>
@@ -141,7 +141,7 @@ export function ApplicationForm() {
             )}
           />
           <div className="flex justify-end">
-            <Button type="submit">Save Application</Button>
+            <Button type="submit">Save Application and Extract Info</Button>
           </div>
         </form>
       </Form>
