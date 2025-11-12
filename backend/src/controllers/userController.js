@@ -7,14 +7,14 @@ const createToken = (_id) => {
 
 export async function signUp(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
 
-    const user = await User.signup(email, password);
+    const user = await User.signup(email, password, name);
 
     // create token
     const token = createToken(user._id);
 
-    res.status(200).json({ token });
+    res.status(200).json({ token, user: { email: user.email, name: user.name } });
   } catch (error) {
     console.error('Error in signUp controller', error);
     res.status(500).json({ message: error.message });
@@ -31,7 +31,7 @@ export async function signIn(req, res) {
     // create token
     const token = createToken(user._id);
 
-    res.status(200).json({ token });
+    res.status(200).json({ token, user: { email: user.email, name: user.name } });
   } catch (error) {
     console.error('Error in signIn controller', error);
     res.status(500).json({ message: error.message });
@@ -45,4 +45,20 @@ export async function signOut(req, res) {
 
 export async function getMe(req, res) {
   res.status(200).send('Welcome back');
+}
+
+export async function googleAuth(req, res) {
+  try {
+    const { googleId, email, name } = req.body;
+
+    const user = await User.googleAuth(googleId, email, name);
+
+    // create token
+    const token = createToken(user._id);
+
+    res.status(200).json({ token, user: { email: user.email, name: user.name } });
+  } catch (error) {
+    console.error('Error in googleAuth controller', error);
+    res.status(400).json({ message: error.message });
+  }
 }

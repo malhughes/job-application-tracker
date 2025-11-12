@@ -10,14 +10,28 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
+    required: false, // Not required for Google OAuth users
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true, // Allows null values while maintaining uniqueness
+  },
+  name: {
+    type: String,
     required: true,
+  },
+  authProvider: {
+    type: String,
+    enum: ['local', 'google'],
+    default: 'local',
   },
 });
 
 // static signup
-userSchema.statics.signup = async function (email, password) {
+userSchema.statics.signup = async function (email, password, name) {
   // validation
-  if (!email || !password) throw Error('Email and password required');
+  if (!email || !password || !name) throw Error('Email, password, and name required');
 
   if (!validator.isEmail(email)) throw Error('Email is invalid');
 
@@ -30,7 +44,7 @@ userSchema.statics.signup = async function (email, password) {
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
 
-  const user = await this.create({ email, password: hash });
+  const user = await this.create({ email, password: hash, name });
 
   return user;
 };
@@ -43,9 +57,36 @@ userSchema.statics.signin = async function (email, password) {
 
   if (!user) throw Error('Incorrect email');
 
+  if (user.authProvider === 'google') throw Error('Please sign in with Google');
+
   const match = await bcrypt.compare(password, user.password);
 
   if (!match) throw Error('Incorrect password');
+
+  return user;
+};
+
+// static google auth
+userSchema.statics.googleAuth = async function (googleId, email, name) {
+  // Check if user exists with Google ID
+  let user = await this.findOne({ googleId });
+
+  if (user) return user;
+
+  // Check if user exists with email (from local auth)
+  user = await this.findOne({ email });
+
+  if (user && user.authProvider === 'local') {
+    throw Error('Email already registered with password. Please sign in with email and password.');
+  }
+
+  // Create new user
+  user = await this.create({
+    email,
+    googleId,
+    name,
+    authProvider: 'google',
+  });
 
   return user;
 };
