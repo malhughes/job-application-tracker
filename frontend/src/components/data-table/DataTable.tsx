@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/drawer';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { ApplicationForm } from '../application-form/ApplicationForm';
+import { ApplicationForm } from '../ApplicationForm';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

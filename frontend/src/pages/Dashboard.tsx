@@ -1,5 +1,5 @@
-import { DataTable } from '@/components/ui/data-table/DataTable';
-import { columns } from '@/components/ui/data-table/columns';
+import { DataTable } from '@/components/data-table/DataTable';
+import { columns } from '@/components/data-table/columns';
 
 type Application = {
   id: string;
@@ -119,8 +119,8 @@ const applications: Application[] = [
 
 export function Dashboard() {
   return (
-    <div className="p-10">
-      <span className="text-4xl font-semibold">Dashboard</span>
+    <div className="px-10 py-4">
+      <span className="text-4xl font-semibold">Applications</span>
       <DataTable columns={columns} data={applications} />
     </div>
   );

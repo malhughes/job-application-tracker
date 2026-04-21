@@ -43,7 +43,7 @@ export function ApplicationForm() {
     console.log('values', values);
   }
 
-  // Watch the textarea value to enable/disable AI Extract button
+  // Watch the textarea value to enable/disable autofill button
   const descriptionValue = form.watch('descriptionOrURL');
 
   return (
@@ -64,7 +64,7 @@ export function ApplicationForm() {
                   />
                 </FormControl>
                 <FormMessage />
-                <div className="item-center flex justify-between">
+                <div className="flex items-center justify-between">
                   <Button>
                     <Upload />
                     Upload File
