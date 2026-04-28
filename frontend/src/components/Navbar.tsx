@@ -29,7 +29,9 @@ export function Navbar() {
             {user && (
               <div>
                 <span className="mr-2 text-black">{user.user?.name}</span>
-                <Button onClick={handleClick}>Sign Out</Button>
+                <Button onClick={handleClick}>
+                  <Link to="/signin">Sign Out</Link>
+                </Button>
               </div>
             )}
             {!user && (
