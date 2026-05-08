@@ -1,8 +1,9 @@
 import Application from '../models/Application.js';
 
 export async function getApplications(req, res) {
+  const user_id = req.user._id;
   try {
-    const applications = await Application.find().sort({ updatedAt: -1 });
+    const applications = await Application.find({ user_id }).sort({ updatedAt: -1 });
     res.status(200).json(applications);
   } catch (error) {
     console.error('Error in getApplications controller', error);
@@ -25,8 +26,9 @@ export async function getApplicationById(req, res) {
 
 export async function createApplication(req, res) {
   try {
+    const user_id = req.user._id;
     const { title, company, status, nextStep } = req.body;
-    const application = new Application({ title, company, status, nextStep });
+    const application = new Application({ title, company, status, nextStep, user_id });
 
     const savedApplication = await application.save();
     res.status(201).json(savedApplication);
