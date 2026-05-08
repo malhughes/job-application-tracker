@@ -41,16 +41,13 @@ interface DataTableProps {
 export function DataTable({ data, onSuccess }: DataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [addOpen, setAddOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState<'add' | 'edit' | null>(null);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
   const handleEdit = (application: Application) => {
     setSelectedApp(application);
-    setEditOpen(true);
+    setOpenDrawer('edit');
   };
-
-  const isOpen = addOpen || editOpen;
 
   const columns = getColumns({ onDelete: onSuccess, onEdit: handleEdit });
 
@@ -67,7 +64,7 @@ export function DataTable({ data, onSuccess }: DataTableProps) {
   });
 
   return (
-    <div className={`transition-all duration-300 ${isOpen ? 'w-3/4' : 'w-full'}`}>
+    <div className={`transition-all duration-300 ${openDrawer ? 'w-3/4' : 'w-full'}`}>
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter companies..."
@@ -76,7 +73,11 @@ export function DataTable({ data, onSuccess }: DataTableProps) {
           className="max-w-sm"
         />
         {/* Add Drawer */}
-        <Drawer direction="right" open={addOpen} onOpenChange={setAddOpen}>
+        <Drawer
+          direction="right"
+          open={openDrawer === 'add'}
+          onOpenChange={(open) => setOpenDrawer(open ? 'add' : null)}
+        >
           <DrawerTrigger asChild>
             <Button>
               <Plus />
@@ -96,7 +97,7 @@ export function DataTable({ data, onSuccess }: DataTableProps) {
               <ApplicationForm
                 onSuccess={() => {
                   onSuccess();
-                  setAddOpen(false);
+                  setOpenDrawer(null);
                 }}
               />
             </div>
@@ -105,7 +106,11 @@ export function DataTable({ data, onSuccess }: DataTableProps) {
       </div>
 
       {/* Edit Drawer */}
-      <Drawer direction="right" open={editOpen} onOpenChange={setEditOpen}>
+      <Drawer
+        direction="right"
+        open={openDrawer === 'edit'}
+        onOpenChange={(open) => setOpenDrawer(open ? 'edit' : null)}
+      >
         <DrawerOverlay className="fixed inset-0 bg-black/5" />
         <DrawerContent className="!max-w-1/4 bottom-2 right-2 top-2 rounded-l-xl">
           <DrawerHeader>
@@ -117,7 +122,7 @@ export function DataTable({ data, onSuccess }: DataTableProps) {
               application={selectedApp}
               onSuccess={() => {
                 onSuccess();
-                setEditOpen(false);
+                setOpenDrawer(null);
               }}
             />
           )}
