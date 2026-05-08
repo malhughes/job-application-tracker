@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  type ColumnDef,
   type ColumnFiltersState,
   type SortingState,
   flexRender,
@@ -32,15 +31,28 @@ import {
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { ApplicationForm } from '../ApplicationForm';
+import { getColumns, type Application } from './columns';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  data: Application[];
+  onSuccess: () => void;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable({ data, onSuccess }: DataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
+
+  const handleEdit = (application: Application) => {
+    setSelectedApp(application);
+    setEditOpen(true);
+  };
+
+  const isOpen = addOpen || editOpen;
+
+  const columns = getColumns({ onDelete: onSuccess, onEdit: handleEdit });
 
   const table = useReactTable({
     data,
@@ -51,14 +63,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
+    state: { sorting, columnFilters },
   });
-  const [open, setOpen] = useState(false);
+
   return (
-    <div className={`transition-all duration-300 ${open ? 'w-3/4' : 'w-full'}`}>
+    <div className={`transition-all duration-300 ${isOpen ? 'w-3/4' : 'w-full'}`}>
       <div className="flex items-center justify-between py-4">
         <Input
           placeholder="Filter companies..."
@@ -66,7 +75,8 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           onChange={(event) => table.getColumn('company')?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
-        <Drawer direction="right" open={open} onOpenChange={setOpen}>
+        {/* Add Drawer */}
+        <Drawer direction="right" open={addOpen} onOpenChange={setAddOpen}>
           <DrawerTrigger asChild>
             <Button>
               <Plus />
@@ -79,29 +89,53 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
               <DrawerHeader>
                 <DrawerTitle className="text-2xl">Add Application</DrawerTitle>
                 <DrawerDescription>
-                  Paste a link, description, or upload a PDF and let AI extract the job details for
-                  you — or enter them manually.
+                  Enter job details and AI will gather details from the provided URL to use when you
+                  access the application later.
                 </DrawerDescription>
               </DrawerHeader>
-              <ApplicationForm />
+              <ApplicationForm
+                onSuccess={() => {
+                  onSuccess();
+                  setAddOpen(false);
+                }}
+              />
             </div>
           </DrawerContent>
         </Drawer>
       </div>
+
+      {/* Edit Drawer */}
+      <Drawer direction="right" open={editOpen} onOpenChange={setEditOpen}>
+        <DrawerOverlay className="fixed inset-0 bg-black/5" />
+        <DrawerContent className="!max-w-1/4 bottom-2 right-2 top-2 rounded-l-xl">
+          <DrawerHeader>
+            <DrawerTitle className="text-2xl">Edit Application</DrawerTitle>
+            <DrawerDescription>Update the details for this application.</DrawerDescription>
+          </DrawerHeader>
+          {selectedApp && (
+            <ApplicationForm
+              application={selectedApp}
+              onSuccess={() => {
+                onSuccess();
+                setEditOpen(false);
+              }}
+            />
+          )}
+        </DrawerContent>
+      </Drawer>
+
       <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead className="p-3" key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead className="p-3" key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
