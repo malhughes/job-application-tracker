@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ClipboardCheck } from 'lucide-react';
 
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from './ui/navigation-menu';
@@ -10,8 +10,8 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 
 export function Navbar() {
   const { signout } = useSignout();
-
   const { user } = useAuthContext();
+  const { pathname } = useLocation();
 
   const handleClick = () => {
     signout();
@@ -37,7 +37,9 @@ export function Navbar() {
             {!user && (
               <div>
                 <Button>
-                  <Link to="/signin">Sign In</Link>
+                  <Link to={pathname === '/signin' ? '/' : '/signin'}>
+                    {pathname === '/signin' ? 'Sign Up' : 'Sign In'}
+                  </Link>
                 </Button>
               </div>
             )}
