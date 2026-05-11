@@ -11,26 +11,55 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSignup } from '@/hooks/useSignup';
+import { useSignin } from '@/hooks/useSignin';
+import { useRef, useState } from 'react';
 
 const formSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  email: z.email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  name: z.string().optional(),
 });
 
-export function Signup() {
+export function Authenticate() {
+  const [authMode, setAuthMode] = useState<'signup' | 'signin'>('signin');
+  const authModeRef = useRef(authMode);
+  authModeRef.current = authMode;
+
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    defaultValues: { email: '', password: '', name: '' },
+    resolver: zodResolver(
+      formSchema.superRefine((data, ctx) => {
+        if (authModeRef.current === 'signup' && (!data.name || data.name.length < 2)) {
+          ctx.addIssue({ code: 'custom', path: ['name'], message: 'Name must be at least 2 characters' });
+        }
+      }),
+    ),
   });
-  const { signup, error, isLoading } = useSignup();
+  const { signup, error: signupError, isLoading: signupLoading } = useSignup();
+  const { signin, error: signinError, isLoading: signinLoading } = useSignin();
   const navigate = useNavigate();
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const success = await signup(values.name, values.email, values.password);
-    if (success) {
-      navigate('/dashboard');
+  const error = authMode === 'signup' ? signupError : signinError;
+  const isLoading = authMode === 'signup' ? signupLoading : signinLoading;
+
+  const switchAuthMode = () => {
+    form.reset();
+    setAuthMode((prevMode) => (prevMode === 'signup' ? 'signin' : 'signup'));
+  };
+
+  async function onSubmit(values: z.infer<typeof formSchema>, authMode: string) {
+    if (authMode === 'signup') {
+      const success = await signup(values.name!, values.email, values.password);
+      if (success) {
+        navigate('/dashboard');
+      }
+    } else {
+      const success = await signin(values.email, values.password);
+      if (success) {
+        navigate('/dashboard');
+      }
     }
   }
 
@@ -51,11 +80,13 @@ export function Signup() {
         >
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit((values) => onSubmit(values, authMode))}
               className="mx-auto w-full max-w-md space-y-8"
             >
               <div>
-                <span className="text-3xl font-medium">Sign up now</span>
+                <span className="text-3xl font-medium">
+                  {authMode === 'signup' ? 'Sign up now!' : 'Welcome back!'}
+                </span>
               </div>
               <FormField
                 control={form.control}
@@ -83,28 +114,30 @@ export function Signup() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input type="name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {authMode === 'signup' && (
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               <div className="flex items-center justify-center gap-4">
                 <Button type="submit" disabled={isLoading}>
-                  Sign Up
+                  {authMode === 'signup' ? 'Sign Up' : 'Sign In'}
                 </Button>
                 <span>
-                  Already have an account?
-                  <Link to="/signin" className="ml-1 underline">
-                    Sign In
-                  </Link>
+                  {authMode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
+                  <span className="ml-1 cursor-pointer underline" onClick={switchAuthMode}>
+                    {authMode === 'signup' ? 'Sign In' : 'Sign Up'}
+                  </span>
                 </span>
               </div>
               {error && (
