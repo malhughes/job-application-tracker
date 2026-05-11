@@ -15,6 +15,9 @@ import { useNavigate } from 'react-router-dom';
 import { useSignup } from '@/hooks/useSignup';
 import { useSignin } from '@/hooks/useSignin';
 import { useRef, useState } from 'react';
+import { GridPattern } from '@/components/ui/grid-pattern';
+import { AnimatePresence, motion } from 'motion/react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const formSchema = z.object({
   email: z.email('Invalid email address'),
@@ -32,9 +35,13 @@ export function Authenticate() {
     resolver: zodResolver(
       formSchema.superRefine((data, ctx) => {
         if (authModeRef.current === 'signup' && (!data.name || data.name.length < 2)) {
-          ctx.addIssue({ code: 'custom', path: ['name'], message: 'Name must be at least 2 characters' });
+          ctx.addIssue({
+            code: 'custom',
+            path: ['name'],
+            message: 'Name must be at least 2 characters',
+          });
         }
-      }),
+      })
     ),
   });
   const { signup, error: signupError, isLoading: signupLoading } = useSignup();
@@ -64,16 +71,32 @@ export function Authenticate() {
   }
 
   return (
-    <div className="flex h-full items-center justify-between gap-8 overflow-auto bg-neutral-800 px-10 text-white">
-      <div className="flex flex-1 items-center justify-center">
-        <div className="flex max-w-lg flex-col gap-4">
+    <div className="relative flex h-full items-center justify-between gap-8 overflow-auto bg-neutral-800 px-10 text-white">
+      <GridPattern />
+      <motion.div
+        className="relative z-10 flex flex-1 items-center justify-center"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
+        <div className="flex max-w-lg flex-col gap-4 rounded-2xl bg-white/25 px-8 py-20 backdrop-blur-[2px]">
           <span className="text-4xl font-medium">AI-powered job tracking made simple</span>
           <span className="text-lg">
             Centralize, summarize, and follow up — all with the help of intelligent automation.
           </span>
+          <DotLottieReact
+            src="https://lottie.host/bdf05385-e606-435a-b04c-243d7322845e/fUb4wVPwFD.lottie"
+            loop
+            autoplay
+          />
         </div>
-      </div>
-      <div className="flex h-full flex-1 items-center justify-center py-8">
+      </motion.div>
+      <motion.div
+        className="relative z-10 flex h-full flex-1 items-center justify-center py-8"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
+      >
         <div
           className="w-full max-w-md overflow-y-auto rounded-2xl border border-gray-200 bg-white p-8 text-black shadow-sm"
           style={{ maxHeight: 'calc(100vh - 8rem)' }}
@@ -83,10 +106,19 @@ export function Authenticate() {
               onSubmit={form.handleSubmit((values) => onSubmit(values, authMode))}
               className="mx-auto w-full max-w-md space-y-8"
             >
-              <div>
-                <span className="text-3xl font-medium">
-                  {authMode === 'signup' ? 'Sign up now!' : 'Welcome back!'}
-                </span>
+              <div className="overflow-hidden">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={authMode}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    className="block text-3xl font-medium"
+                  >
+                    {authMode === 'signup' ? 'Sign up now!' : 'Welcome back!'}
+                  </motion.span>
+                </AnimatePresence>
               </div>
               <FormField
                 control={form.control}
@@ -114,7 +146,16 @@ export function Authenticate() {
                   </FormItem>
                 )}
               />
-              {authMode === 'signup' && (
+              <motion.div
+                initial={false}
+                animate={{
+                  height: authMode === 'signup' ? 'auto' : 0,
+                  opacity: authMode === 'signup' ? 1 : 0,
+                  marginBottom: authMode === 'signup' ? '2rem' : 0,
+                }}
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                style={{ overflow: 'hidden' }}
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -128,7 +169,7 @@ export function Authenticate() {
                     </FormItem>
                   )}
                 />
-              )}
+              </motion.div>
               <div className="flex items-center justify-center gap-4">
                 <Button type="submit" disabled={isLoading}>
                   {authMode === 'signup' ? 'Sign Up' : 'Sign In'}
@@ -146,7 +187,7 @@ export function Authenticate() {
             </form>
           </Form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
