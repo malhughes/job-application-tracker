@@ -71,16 +71,19 @@ export function Authenticate() {
   }
 
   return (
-    <div className="relative flex h-full items-center justify-between gap-8 overflow-auto bg-neutral-800 px-10 text-white">
-      <GridPattern />
-      <motion.div
-        className="relative z-10 flex flex-1 items-center justify-center"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-      >
-        <div className="flex max-w-lg flex-col gap-4 rounded-2xl bg-white/25 px-8 py-20 backdrop-blur-[2px]">
-          <span className="text-4xl font-medium">AI-powered job tracking made simple</span>
+    <div className="flex h-full overflow-hidden">
+      {/* Left panel — grid pattern + hero text */}
+      <div className="flex-2 relative hidden overflow-hidden text-neutral-900 lg:flex lg:items-center lg:justify-center">
+        <GridPattern />
+        <motion.div
+          className="relative z-10 flex max-w-lg flex-col gap-6"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <span className="text-5xl font-semibold leading-tight">
+            AI-powered job tracking made simple
+          </span>
           <span className="text-lg">
             Centralize, summarize, and follow up — all with the help of intelligent automation.
           </span>
@@ -89,22 +92,21 @@ export function Authenticate() {
             loop
             autoplay
           />
-        </div>
-      </motion.div>
-      <motion.div
-        className="relative z-10 flex h-full flex-1 items-center justify-center py-8"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
-      >
-        <div
-          className="w-full max-w-md overflow-y-auto rounded-2xl border border-gray-200 bg-white p-8 text-black shadow-sm"
-          style={{ maxHeight: 'calc(100vh - 8rem)' }}
+        </motion.div>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex flex-1 items-center justify-center overflow-y-auto border-x bg-white px-8 py-12">
+        <motion.div
+          className="w-full max-w-md"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut', delay: 0.1 }}
         >
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit((values) => onSubmit(values, authMode))}
-              className="mx-auto w-full max-w-md space-y-8"
+              className="space-y-8"
             >
               <div className="overflow-hidden">
                 <AnimatePresence mode="wait" initial={false}>
@@ -114,11 +116,16 @@ export function Authenticate() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
                     transition={{ duration: 0.2, ease: 'easeInOut' }}
-                    className="block text-3xl font-medium"
+                    className="block text-3xl font-semibold text-neutral-900"
                   >
                     {authMode === 'signup' ? 'Sign up now!' : 'Welcome back!'}
                   </motion.span>
                 </AnimatePresence>
+                <p className="mt-1 text-sm text-neutral-500">
+                  {authMode === 'signup'
+                    ? 'Create an account to get started.'
+                    : 'Sign in to your account to continue.'}
+                </p>
               </div>
               <FormField
                 control={form.control}
@@ -170,24 +177,27 @@ export function Authenticate() {
                   )}
                 />
               </motion.div>
-              <div className="flex items-center justify-center gap-4">
-                <Button type="submit" disabled={isLoading}>
+              <div className="flex flex-col gap-3">
+                <Button type="submit" disabled={isLoading} className="w-full">
                   {authMode === 'signup' ? 'Sign Up' : 'Sign In'}
                 </Button>
-                <span>
+                <p className="text-center text-sm text-neutral-500">
                   {authMode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
-                  <span className="ml-1 cursor-pointer underline" onClick={switchAuthMode}>
+                  <span
+                    className="ml-1 cursor-pointer font-medium text-neutral-900 underline underline-offset-2"
+                    onClick={switchAuthMode}
+                  >
                     {authMode === 'signup' ? 'Sign In' : 'Sign Up'}
                   </span>
-                </span>
+                </p>
               </div>
               {error && (
-                <div className="flex items-center justify-center text-red-500">{error}</div>
+                <div className="flex items-center justify-center text-sm text-red-500">{error}</div>
               )}
             </form>
           </Form>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }
