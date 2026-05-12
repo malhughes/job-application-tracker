@@ -85,7 +85,6 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
       form.reset();
       onSuccess();
     }
-    console.log(json);
   };
 
   return (

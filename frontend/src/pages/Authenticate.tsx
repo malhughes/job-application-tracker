@@ -138,7 +138,12 @@ export function Authenticate() {
                     : 'Sign in to your account to continue.'}
                 </p>
               </div>
-              <Button type="button" className="w-full" disabled={googleLoading} onClick={() => googleLogin()}>
+              <Button
+                type="button"
+                className="w-full"
+                disabled={googleLoading}
+                onClick={() => googleLogin()}
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="size-5">
                   <path
                     fill="#FFC107"
