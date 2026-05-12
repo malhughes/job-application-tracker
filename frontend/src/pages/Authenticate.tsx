@@ -179,7 +179,13 @@ export function Authenticate() {
               </motion.div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" disabled={isLoading} className="w-full">
-                  {authMode === 'signup' ? 'Sign Up' : 'Sign In'}
+                  {!isLoading && authMode === 'signup'
+                    ? 'Sign Up'
+                    : !isLoading && authMode === 'signin'
+                      ? 'Sign In'
+                      : isLoading && authMode === 'signup'
+                        ? 'Signing Up...'
+                        : 'Signing In...'}
                 </Button>
                 <p className="text-center text-sm text-neutral-500">
                   {authMode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
