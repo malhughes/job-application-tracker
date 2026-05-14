@@ -84,25 +84,27 @@ export async function generateFollowupEmail(req, res) {
   }
 }
 
-// integrate in later version
-/* export async function generateResumeBullets(req, res) {
-  try {
-    const { job_description, skills } = req.body;
+export async function extractDetailsFromText(text) {
+  const prompt = `Extract key details from the following job posting text.
+  Respond ONLY with a JSON code block using this exact shape:
+  \`\`\`json
+  { "title": "...", "company": "...", "location": "...", "skills": ["...", ...], "summary": "..." }
+  \`\`\`
+  - skills: 5–7 items max
+  - summary: 120 words max
 
-    if (!job_description || !skills) {
-      return res.status(404).json({ message: 'Missing job description or skills.' });
-    }
+  Job posting:
+  ${text}`;
 
-    const prompt = `Based on this job description and set of skills, generate 3-5 professional resume bullet points.
-    Respond as JSON: {"bullet_points" : [...]}
-    
-    job_description:
-    ${job_description}
-    
-    skills:
-    ${skills}`;
-  } catch (error) {
-    console.error('Error in extractJobDetails controller', error);
-    res.status(500).json({ message: 'Internal error' });
-  }
-} */
+  const response = await openai.responses.create({
+    model: MODEL,
+    input: prompt,
+    max_output_tokens: 1000,
+  });
+
+  const cleaned = response.output_text
+    .replace(/```json\s*/i, '')
+    .replace(/```$/, '')
+    .trim();
+  return JSON.parse(cleaned);
+}

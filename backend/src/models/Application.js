@@ -18,6 +18,23 @@ const applicationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    link: {
+      type: String,
+    },
+    location: {
+      type: String,
+    },
+    skills: {
+      type: [String],
+      default: [],
+    },
+    aiSummary: {
+      type: String,
+    },
+    aiExtracted: {
+      type: Boolean,
+      default: false,
+    },
     user_id: {
       type: String,
       required: true,
