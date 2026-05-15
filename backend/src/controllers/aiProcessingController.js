@@ -1,6 +1,8 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import Application from '../models/Application.js';
+import { scrapeJobPosting } from '../utils/scrapeJobDescription.js';
+import { extractDetailsFromText } from '../utils/extractDetailsFromText.js';
 
 dotenv.config();
 
@@ -8,7 +10,7 @@ if (!process.env.OPENAI_API_KEY) {
   throw new Error('❌ Missing OPENAI_API_KEY in environment variables.');
 }
 
-const MODEL = process.env.AI_MODEL || 'gpt-5-nano';
+const MODEL = process.env.AI_MODEL || 'gpt-4o-mini';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,31 +18,15 @@ const openai = new OpenAI({
 
 export async function extractJobDetails(req, res) {
   try {
-    const job_description = typeof req.body === 'string' ? req.body : req.body.text;
+    const { url } = req.body;
 
-    if (!job_description) {
-      return res.status(404).json({ message: 'Missing job description text.' });
+    if (!url) {
+      return res.status(400).json({ message: 'Missing url field.' });
     }
 
-    const prompt = `Extract key details from the following job description.
-    Return JSON with keys: title, company, location, skills (5-7 items max), and summary (<= 120 words).
+    const jobText = await scrapeJobPosting(url);
+    const data = await extractDetailsFromText(jobText);
 
-    Job description:
-    ${job_description}`;
-
-    const response = await openai.responses.create({
-      model: MODEL,
-      input: prompt,
-      max_output_tokens: 1000,
-    });
-
-    const output = response.output_text;
-    let data = undefined;
-    try {
-      data = JSON.parse(output);
-    } catch {
-      data = { rawText: output };
-    }
     res.status(200).json(data);
   } catch (error) {
     console.error('Error in extractJobDetails controller', error);
@@ -82,29 +68,4 @@ export async function generateFollowupEmail(req, res) {
     console.error('Error in generateFollowupEmail controller', error);
     res.status(500).json({ message: 'Internal error' });
   }
-}
-
-export async function extractDetailsFromText(text) {
-  const prompt = `Extract key details from the following job posting text.
-  Respond ONLY with a JSON code block using this exact shape:
-  \`\`\`json
-  { "title": "...", "company": "...", "location": "...", "skills": ["...", ...], "summary": "..." }
-  \`\`\`
-  - skills: 5–7 items max
-  - summary: 120 words max
-
-  Job posting:
-  ${text}`;
-
-  const response = await openai.responses.create({
-    model: MODEL,
-    input: prompt,
-    max_output_tokens: 1000,
-  });
-
-  const cleaned = response.output_text
-    .replace(/```json\s*/i, '')
-    .replace(/```$/, '')
-    .trim();
-  return JSON.parse(cleaned);
 }

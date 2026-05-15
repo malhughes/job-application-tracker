@@ -22,13 +22,19 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useAuthContext } from '@/hooks/useAuthContext';
+import { useNavigate } from 'react-router';
 
 export type Application = {
   _id: string;
   title: string;
   company: string;
+  link: string;
   status: 'applied' | 'interviewing' | 'rejected';
   nextStep: string;
+  location?: string;
+  skills?: string[];
+  aiSummary?: string;
+  aiExtracted?: boolean;
 };
 
 function ActionsCell({
@@ -41,6 +47,7 @@ function ActionsCell({
   onEdit: (application: Application) => void;
 }) {
   const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   const deleteApplication = async (id: string) => {
     await fetch(`/api/applications/${id}`, {
@@ -90,11 +97,7 @@ function ActionsCell({
           </AlertDialogContent>
         </AlertDialog>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onSelect={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <DropdownMenuItem onSelect={() => navigate(`/application/${application._id}`)}>
           View Application Info
         </DropdownMenuItem>
       </DropdownMenuContent>

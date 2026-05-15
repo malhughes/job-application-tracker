@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useState } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
 
 const statusOptions = ['applied', 'interviewing', 'rejected'] as const;
@@ -46,6 +47,8 @@ type ApplicationFormProps = {
 
 export function ApplicationForm({ onSuccess, application }: ApplicationFormProps) {
   const isEditing = !!application;
+  const [isLoading, setIsLoading] = useState(false);
+  const [extractionWarning, setExtractionWarning] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,6 +75,7 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
     const url = isEditing ? `/api/applications/${application._id}` : '/api/applications/';
     const method = isEditing ? 'PUT' : 'POST';
 
+    setIsLoading(true);
     const response = await fetch(url, {
       method,
       headers: {
@@ -80,10 +84,20 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
       },
       body: JSON.stringify({ title, company, link, status, nextStep }),
     });
-    const json = await response.json();
+    setIsLoading(false);
+
     if (response.ok) {
-      form.reset();
-      onSuccess();
+      if (response.headers.get('X-AI-Extraction') === 'failed') {
+        setExtractionWarning(true);
+        setTimeout(() => {
+          setExtractionWarning(false);
+          form.reset();
+          onSuccess();
+        }, 3000);
+      } else {
+        form.reset();
+        onSuccess();
+      }
     }
   };
 
@@ -167,9 +181,14 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
               </FormItem>
             )}
           />
+          {extractionWarning && (
+            <p className="text-sm text-yellow-600">
+              Application saved, but we couldn't extract info from that URL.
+            </p>
+          )}
           <div className="flex justify-end">
-            <Button type="submit">
-              {isEditing ? 'Save Changes' : 'Save Application and Extract Info'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Save Application and Extract Info'}
             </Button>
           </div>
         </form>

@@ -1,4 +1,6 @@
 import Application from '../models/Application.js';
+import { scrapeJobPosting } from '../utils/scrapeJobDescription.js';
+import { extractDetailsFromText } from '../utils/extractDetailsFromText.js';
 
 export async function getApplications(req, res) {
   const user_id = req.user._id;
@@ -27,10 +29,26 @@ export async function getApplicationById(req, res) {
 export async function createApplication(req, res) {
   try {
     const user_id = req.user._id;
-    const { title, company, status, nextStep } = req.body;
-    const application = new Application({ title, company, status, nextStep, user_id });
+    const { title, company, link, status, nextStep } = req.body;
+    const application = new Application({ title, company, link, status, nextStep, user_id });
 
     const savedApplication = await application.save();
+
+    if (link) {
+      try {
+        const rawText = await scrapeJobPosting(link);
+        const aiData = await extractDetailsFromText(rawText);
+        savedApplication.location = aiData.location;
+        savedApplication.skills = aiData.skills;
+        savedApplication.aiSummary = aiData.summary;
+        savedApplication.aiExtracted = true;
+        await savedApplication.save();
+      } catch (aiError) {
+        console.error('AI extraction failed:', aiError.message);
+        res.set('X-AI-Extraction', 'failed');
+      }
+    }
+
     res.status(201).json(savedApplication);
   } catch (error) {
     console.error('Error in createApplication controller', error);
