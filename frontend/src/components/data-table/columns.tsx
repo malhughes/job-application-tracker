@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import { useNavigate } from 'react-router';
+import { useState } from 'react';
 
 export type Application = {
   _id: string;
@@ -51,12 +52,17 @@ function ActionsCell({
 }) {
   const { user } = useAuthContext();
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const deleteApplication = async (id: string) => {
+    setDeleting(true);
     await fetch(`/api/applications/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${user?.token}` },
     });
+    setDeleting(false);
+    setDialogOpen(false);
     onDelete();
   };
 
@@ -78,7 +84,7 @@ function ActionsCell({
         >
           Edit Application
         </DropdownMenuItem>
-        <AlertDialog>
+        <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <AlertDialogTrigger asChild>
             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
               Delete Application
@@ -92,9 +98,15 @@ function ActionsCell({
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => deleteApplication(application._id)}>
-                Continue
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={deleting}
+                onClick={(e) => {
+                  e.preventDefault();
+                  deleteApplication(application._id);
+                }}
+              >
+                {deleting ? 'Deleting...' : 'Continue'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
