@@ -34,7 +34,7 @@ app.use('/api/ai', aiProcessingRoutes);
 app.use(express.static(frontendDist));
 
 // SPA catch-all — return index.html for any non-API route
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
   res.sendFile(path.join(frontendDist, 'index.html'));
 });
 
