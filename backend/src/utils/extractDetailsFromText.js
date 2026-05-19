@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const MODEL = process.env.AI_MODEL || 'gpt-4o-mini';
+const MODEL = process.env.AI_MODEL || 'gpt-5.4-nano';
 
 export async function extractDetailsFromText(text) {
   const prompt = `Extract key details from the following job posting text.
@@ -13,7 +13,7 @@ Respond ONLY with a JSON code block using this exact shape:
 { "title": "...", "company": "...", "location": "...", "skills": ["...", ...], "summary": "..." }
 \`\`\`
 - skills: 5–7 items max
-- summary: 120 words max
+- summary: 120 words max (include compensation details if mentioned)
 
 Job posting:
 ${text}`;
