@@ -9,8 +9,8 @@ interface AISummaryProps {
 export function AISummary({ aiExtracted, aiSummary }: AISummaryProps) {
   if (!aiExtracted) {
     return (
-      <Card className="border-border bg-card">
-        <CardHeader className="pb-4">
+      <Card className="border-border bg-card gap-2">
+        <CardHeader className="pb-2">
           <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
             <Sparkles className="text-primary h-5 w-5" />
             AI Insights
@@ -30,8 +30,8 @@ export function AISummary({ aiExtracted, aiSummary }: AISummaryProps) {
   }
 
   return (
-    <Card className="border-border bg-card">
-      <CardHeader className="pb-4">
+    <Card className="border-border bg-card gap-2">
+      <CardHeader className="pb-2">
         <CardTitle className="text-foreground flex items-center gap-2 text-lg font-semibold">
           <Sparkles className="text-primary h-5 w-5" />
           AI Insights

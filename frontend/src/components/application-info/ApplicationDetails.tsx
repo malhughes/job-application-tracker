@@ -9,8 +9,8 @@ interface ApplicationDetailsProps {
 
 export function ApplicationDetails({ location, skills }: ApplicationDetailsProps) {
   return (
-    <Card className="border-border bg-card">
-      <CardHeader className="pb-4">
+    <Card className="border-border bg-card gap-2">
+      <CardHeader className="pb-2">
         <CardTitle className="text-foreground text-lg font-semibold">Job Details</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">

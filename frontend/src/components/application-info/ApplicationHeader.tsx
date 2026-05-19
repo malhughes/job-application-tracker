@@ -55,7 +55,7 @@ export function ApplicationHeader({
 
           <Badge
             variant="outline"
-            className={`h-fit shrink-0 px-3 py-1.5 text-sm font-medium ${getStatusColor(status)}`}
+            className={`h-fit shrink-0 px-3 py-1.5 text-lg font-medium ${getStatusColor(status)}`}
           >
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </Badge>
