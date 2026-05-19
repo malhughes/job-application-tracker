@@ -53,7 +53,16 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     const user = JSON.parse(localStorage.getItem('user') as string);
 
     if (user) {
-      dispatch({ type: 'SIGNIN', payload: user });
+      try {
+        const payload = JSON.parse(atob(user.token.split('.')[1]));
+        if (payload.exp * 1000 < Date.now()) {
+          localStorage.removeItem('user');
+        } else {
+          dispatch({ type: 'SIGNIN', payload: user });
+        }
+      } catch {
+        localStorage.removeItem('user');
+      }
     }
   }, []);
 

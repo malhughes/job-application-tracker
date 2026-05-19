@@ -4,21 +4,26 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Application } from '@/components/data-table/columns';
 import { BouncyText } from '@/components/motion/text-effects/BouncyText';
 import { motion } from 'motion/react';
+import { apiFetch } from '@/lib/apiFetch';
 
 export function Dashboard() {
-  const { user } = useAuthContext();
+  const { user, dispatch } = useAuthContext();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
-    const response = await fetch('/api/applications/', {
-      headers: { Authorization: `Bearer ${user?.token}` },
-    });
-    const json = await response.json();
-    setApplications(json);
+    const response = await apiFetch(
+      '/api/applications/',
+      { headers: { Authorization: `Bearer ${user?.token}` } },
+      dispatch,
+    );
+    if (response.ok) {
+      const json = await response.json();
+      setApplications(json);
+    }
     setLoading(false);
-  }, [user]);
+  }, [user, dispatch]);
 
   useEffect(() => {
     if (user) fetchApplications();

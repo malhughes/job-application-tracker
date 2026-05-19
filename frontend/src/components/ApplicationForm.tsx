@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { useState } from 'react';
 import { useAuthContext } from '../hooks/useAuthContext';
+import { apiFetch } from '@/lib/apiFetch';
 
 const statusOptions = ['applied', 'interviewing', 'rejected'] as const;
 
@@ -63,7 +64,7 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
       : undefined,
   });
 
-  const { user } = useAuthContext();
+  const { user, dispatch } = useAuthContext();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user) {
@@ -76,14 +77,18 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
     const method = isEditing ? 'PUT' : 'POST';
 
     setIsLoading(true);
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${user.token}`,
+    const response = await apiFetch(
+      url,
+      {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify({ title, company, link, status, nextStep }),
       },
-      body: JSON.stringify({ title, company, link, status, nextStep }),
-    });
+      dispatch,
+    );
     setIsLoading(false);
 
     if (response.ok) {

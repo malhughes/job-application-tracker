@@ -2,24 +2,25 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { useAuthContext } from '@/hooks/useAuthContext';
 import type { Application } from '@/components/data-table/columns';
+import { apiFetch } from '@/lib/apiFetch';
 
 export function ApplicationInfo() {
   const { id } = useParams();
-  const { user } = useAuthContext();
+  const { user, dispatch } = useAuthContext();
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user || !id) return;
-    fetch(`/api/applications/${id}`, {
-      headers: { Authorization: `Bearer ${user.token}` },
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        setApplication(data);
-        setLoading(false);
-      });
-  }, [id, user]);
+    apiFetch(
+      `/api/applications/${id}`,
+      { headers: { Authorization: `Bearer ${user.token}` } },
+      dispatch,
+    ).then(async (r) => {
+      if (r.ok) setApplication(await r.json());
+      setLoading(false);
+    });
+  }, [id, user, dispatch]);
 
   if (loading) return <p>Loading...</p>;
   if (!application) return <p>Application not found.</p>;
