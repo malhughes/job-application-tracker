@@ -48,25 +48,26 @@ export function ApplicationInfo() {
     <div className="px-20 py-8">
       <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp}>
         <ApplicationHeader
-          title={application.title}
-          company={application.company}
+          title={application.jobDetails.title}
+          company={application.jobDetails.company}
           status={application.status}
           nextStep={application.nextStep}
-          link={application.link}
+          link={application.jobDetails.link}
         />
       </motion.div>
 
       <div className="mt-12 grid gap-8 md:grid-cols-2">
         <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
           <ApplicationDetails
-            location={application.location ?? ''}
-            skills={application.skills ?? []}
+            location={application.jobDetails.location ?? ''}
+            compensation={application.jobDetails.compensation ?? null}
+            skills={application.jobDetails.skills ?? []}
           />
         </motion.div>
         <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
           <AISummary
-            aiSummary={application.aiSummary ?? ''}
-            aiExtracted={application.aiExtracted ?? false}
+            aiSummary={application.jobDetails.aiSummary ?? ''}
+            aiExtracted={application.jobDetails.aiExtracted ?? false}
           />
         </motion.div>
       </div>

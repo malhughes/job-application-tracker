@@ -32,13 +32,18 @@ export async function createApplication(req, res) {
     const { title, company, link, status, nextStep } = req.body;
 
     if (link) {
-      const existing = await Application.findOne({ user_id, link });
+      const existing = await Application.findOne({ user_id, 'jobDetails.link': link });
       if (existing) {
         return res.status(409).json({ message: 'An application with that link already exists.' });
       }
     }
 
-    const application = new Application({ title, company, link, status, nextStep, user_id });
+    const application = new Application({
+      status,
+      nextStep,
+      user_id,
+      jobDetails: { title, company, link },
+    });
 
     const savedApplication = await application.save();
 
@@ -46,10 +51,11 @@ export async function createApplication(req, res) {
       try {
         const rawText = await scrapeJobPosting(link);
         const aiData = await extractDetailsFromText(rawText);
-        savedApplication.location = aiData.location;
-        savedApplication.skills = aiData.skills;
-        savedApplication.aiSummary = aiData.summary;
-        savedApplication.aiExtracted = true;
+        savedApplication.jobDetails.location = aiData.location;
+        savedApplication.jobDetails.compensation = aiData.compensation;
+        savedApplication.jobDetails.skills = aiData.skills;
+        savedApplication.jobDetails.aiSummary = aiData.summary;
+        savedApplication.jobDetails.aiExtracted = true;
         await savedApplication.save();
       } catch (aiError) {
         console.error('AI extraction failed:', aiError.message);
@@ -69,7 +75,12 @@ export async function updateApplication(req, res) {
     const { title, company, status, nextStep } = req.body;
     const updatedApplication = await Application.findByIdAndUpdate(
       req.params.id,
-      { title, company, status, nextStep },
+      {
+        status,
+        nextStep,
+        'jobDetails.title': title,
+        'jobDetails.company': company,
+      },
       { new: true }
     );
 

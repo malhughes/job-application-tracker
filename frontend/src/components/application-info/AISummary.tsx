@@ -41,7 +41,7 @@ export function AISummary({ aiExtracted, aiSummary }: AISummaryProps) {
         <div className="space-y-4">
           <div className="space-y-2">
             <h3 className="text-muted-foreground text-xs uppercase tracking-wider">Summary</h3>
-            <p className="text-foreground/90 text-sm leading-relaxed">{aiSummary}</p>
+            <p className="text-foreground/90 text-md leading-relaxed">{aiSummary}</p>
           </div>
         </div>
       </CardContent>

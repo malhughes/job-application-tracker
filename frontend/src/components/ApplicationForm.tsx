@@ -39,11 +39,13 @@ type ApplicationFormProps = {
   onSuccess: () => void;
   application?: {
     _id: string;
-    title: string;
-    company: string;
-    link: string;
     status: 'applied' | 'interviewing' | 'rejected';
     nextStep: string;
+    jobDetails: {
+      title: string;
+      company: string;
+      link: string;
+    };
   };
 };
 
@@ -56,11 +58,11 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
     resolver: zodResolver(formSchema),
     defaultValues: application
       ? {
-          title: application.title,
-          company: application.company,
+          title: application.jobDetails.title,
+          company: application.jobDetails.company,
           status: application.status,
           nextStep: application.nextStep,
-          link: application.link,
+          link: application.jobDetails.link,
         }
       : undefined,
   });

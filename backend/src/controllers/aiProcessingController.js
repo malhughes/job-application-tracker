@@ -40,7 +40,8 @@ export async function generateFollowupEmail(req, res) {
 
     if (!application) return res.status(404).json({ message: 'Application not found' });
 
-    const { title, company, status, nextStep } = application;
+    const { status, nextStep } = application;
+    const { title, company } = application.jobDetails;
 
     const prompt = `Write a concise, professional follow-up email template (75-120 words) based on the following job application details.
 

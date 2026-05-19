@@ -10,10 +10,11 @@ export async function extractDetailsFromText(text) {
   const prompt = `Extract key details from the following job posting text.
 Respond ONLY with a JSON code block using this exact shape:
 \`\`\`json
-{ "title": "...", "company": "...", "location": "...", "skills": ["...", ...], "summary": "..." }
+{ "title": "...", "company": "...", "location": "...", "compensation": [{ "label": "...", "range": "..." }], "skills": ["...", ...], "summary": "..." }
 \`\`\`
 - skills: 5–7 items max
-- summary: 120 words max (include compensation details if mentioned)
+- compensation: array of pay ranges; if zones/tiers exist use one entry per zone with a short label that includes the zone name and 2–3 representative cities in parentheses (e.g. "Zone 1 (SF/NYC/Seattle)"), if a single salary use one entry with an empty label string, if not mentioned use null
+- summary: 120 words max
 
 Job posting:
 ${text}`;

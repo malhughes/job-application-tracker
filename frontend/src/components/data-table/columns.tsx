@@ -26,15 +26,18 @@ import { useNavigate } from 'react-router';
 
 export type Application = {
   _id: string;
-  title: string;
-  company: string;
-  link: string;
   status: 'applied' | 'interviewing' | 'rejected';
   nextStep: string;
-  location?: string;
-  skills?: string[];
-  aiSummary?: string;
-  aiExtracted?: boolean;
+  jobDetails: {
+    title: string;
+    company: string;
+    link: string;
+    location?: string;
+    compensation?: { label: string; range: string }[] | null;
+    skills?: string[];
+    aiSummary?: string;
+    aiExtracted?: boolean;
+  };
 };
 
 function ActionsCell({
@@ -60,7 +63,7 @@ function ActionsCell({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="p0 h-8 w-8">
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -114,11 +117,13 @@ export function getColumns({
 }): ColumnDef<Application>[] {
   return [
     {
-      accessorKey: 'title',
+      id: 'title',
+      accessorFn: (row) => row.jobDetails.title,
       header: ({ column }) => <DataTableColumnHeader column={column} title="Job Title" />,
     },
     {
-      accessorKey: 'company',
+      id: 'company',
+      accessorFn: (row) => row.jobDetails.company,
       header: ({ column }) => <DataTableColumnHeader column={column} title="Company" />,
     },
     {
