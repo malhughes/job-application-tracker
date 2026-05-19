@@ -124,6 +124,10 @@ export function getColumns({
     {
       accessorKey: 'status',
       header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+      cell: ({ row }) => {
+        const status = row.getValue<string>('status');
+        return status.charAt(0).toUpperCase() + status.slice(1);
+      },
     },
     {
       accessorKey: 'nextStep',
