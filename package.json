@@ -18,6 +18,8 @@
     "typescript-eslint": "^8.39.0"
   },
   "scripts": {
+    "build": "pnpm --filter frontend build",
+    "start": "node backend/src/server.js",
     "lint": "eslint .",
     "format": "prettier --write ."
   }
