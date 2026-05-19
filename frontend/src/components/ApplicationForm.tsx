@@ -41,6 +41,7 @@ type ApplicationFormProps = {
     _id: string;
     title: string;
     company: string;
+    link: string;
     status: 'applied' | 'interviewing' | 'rejected';
     nextStep: string;
   };
@@ -59,7 +60,7 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
           company: application.company,
           status: application.status,
           nextStep: application.nextStep,
-          link: '',
+          link: application.link,
         }
       : undefined,
   });
@@ -87,7 +88,7 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
         },
         body: JSON.stringify({ title, company, link, status, nextStep }),
       },
-      dispatch,
+      dispatch
     );
     setIsLoading(false);
 
@@ -148,7 +149,7 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
               <FormItem>
                 <FormLabel>Link</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input disabled={isEditing} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -198,7 +199,11 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : isEditing ? 'Save Changes' : 'Save Application and Extract Info'}
+              {isLoading
+                ? 'Saving...'
+                : isEditing
+                  ? 'Save Changes'
+                  : 'Save Application and Extract Info'}
             </Button>
           </div>
         </form>
