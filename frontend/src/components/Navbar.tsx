@@ -20,7 +20,7 @@ export function Navbar() {
     <div className="shadwo-xs border-b-1 flex w-full items-center justify-between border-gray-200 p-4">
       <span className="flex items-center gap-2">
         <ClipboardCheck size={30} />
-        <span className="text-xl font-medium">Appstrack</span>
+        <span className="text-xl font-medium">Apptrack</span>
       </span>
       <NavigationMenu>
         <NavigationMenuList>
