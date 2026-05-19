@@ -56,14 +56,14 @@ export async function generateFollowupEmail(req, res) {
     - Include a short greeting, brief mention of the role, and a respectful close
     Do not include placeholders like [Your Name]; just write the body text.`;
 
-    const response = await openai.responses.create({
+    const response = await openai.chat.completions.create({
       model: MODEL,
-      input: prompt,
-      max_output_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 500,
     });
 
     res.status(200).json({
-      email: response.output_text.trim(),
+      email: response.choices[0].message.content.trim(),
     });
   } catch (error) {
     console.error('Error in generateFollowupEmail controller', error);
