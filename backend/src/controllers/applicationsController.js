@@ -30,6 +30,14 @@ export async function createApplication(req, res) {
   try {
     const user_id = req.user._id;
     const { title, company, link, status, nextStep } = req.body;
+
+    if (link) {
+      const existing = await Application.findOne({ user_id, link });
+      if (existing) {
+        return res.status(409).json({ message: 'An application with that link already exists.' });
+      }
+    }
+
     const application = new Application({ title, company, link, status, nextStep, user_id });
 
     const savedApplication = await application.save();

@@ -91,6 +91,11 @@ export function ApplicationForm({ onSuccess, application }: ApplicationFormProps
     );
     setIsLoading(false);
 
+    if (response.status === 409) {
+      form.setError('link', { message: 'An application with that link already exists.' });
+      return;
+    }
+
     if (response.ok) {
       if (response.headers.get('X-AI-Extraction') === 'failed') {
         setExtractionWarning(true);
